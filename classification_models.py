@@ -88,34 +88,34 @@ def preprocess_data(df, target_region="NSW1"):
 
 # --- Model Training Functions ---
 
-# def train_svm(X_train, y_train):
-#     """
-#     Trains a Support Vector Machine classifier with hyperparameter tuning.
-#     """
-#     print("--- Training Support Vector Machine (SVM) ---")
-#     param_dist = {
-#         'C': np.logspace(-3, 2, 10),
-#         'gamma': np.logspace(-4, 1, 10),
-#         'kernel': ['rbf', 'poly', 'sigmoid']
-#     }
-#
-#     svm = SVC(class_weight='balanced', probability=True, random_state=42)
-#
-#     random_search = RandomizedSearchCV(
-#         estimator=svm,
-#         param_distributions=param_dist,
-#         n_iter=150,
-#         cv=5,
-#         scoring='roc_auc',
-#         n_jobs=-1,
-#         random_state=42,
-#         verbose=1
-#     )
-#
-#     random_search.fit(X_train, y_train)
-#     print(f"Best SVM parameters: {random_search.best_params_}")
-#     print("-" * 40)
-#     return random_search.best_estimator_
+def train_svm(X_train, y_train):
+    """
+    Trains a Support Vector Machine classifier with hyperparameter tuning.
+    """
+    print("--- Training Support Vector Machine (SVM) ---")
+    param_dist = {
+        'C': np.logspace(-3, 2, 10),
+        'gamma': np.logspace(-4, 1, 10),
+        'kernel': ['rbf', 'poly', 'sigmoid']
+    }
+
+    svm = SVC(class_weight='balanced', probability=True, random_state=42)
+
+    random_search = RandomizedSearchCV(
+        estimator=svm,
+        param_distributions=param_dist,
+        n_iter=300,
+        cv=5,
+        scoring='roc_auc',
+        n_jobs=-1,
+        random_state=42,
+        verbose=1
+    )
+
+    random_search.fit(X_train, y_train)
+    print(f"Best SVM parameters: {random_search.best_params_}")
+    print("-" * 40)
+    return random_search.best_estimator_
 
 def train_lr(X_train, y_train):
     """
@@ -133,7 +133,7 @@ def train_lr(X_train, y_train):
     random_search = RandomizedSearchCV(
         estimator=lr,
         param_distributions=param_dist,
-        n_iter=150,
+        n_iter=300,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -175,7 +175,7 @@ def train_xgb(X_train, y_train):
     random_search = RandomizedSearchCV(
         estimator=xgb_clf,
         param_distributions=param_dist,
-        n_iter=150,
+        n_iter=300,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -207,7 +207,7 @@ def train_knn(X_train, y_train):
     random_search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_dist,
-        n_iter=150, # Will be capped by the number of combinations, which is less than 200
+        n_iter=300, # Will be capped by the number of combinations, which is less than 200
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     evaluate_model(knn_model, X_test, y_test, test_df, "K-Nearest Neighbors", target_region)
     
     # SVM (Note: Can be very slow on large datasets)
-    # svm_model = train_svm(X_train, y_train)
-    # evaluate_model(svm_model, X_test, y_test, test_df, "Support Vector Machine", target_region)
+    svm_model = train_svm(X_train, y_train)
+    evaluate_model(svm_model, X_test, y_test, test_df, "Support Vector Machine", target_region)
     
     print("Script finished.")
