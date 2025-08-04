@@ -2,23 +2,23 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import pandas as pd
 import numpy as np
 
-def evaluate_meta_model(meta_model, base_models, X_test, y_test, test_df, model_name, target_region):
+
+def evaluate_meta_model(meta_model, base_models, X_test_base, y_test, test_df, model_name, target_region):
     """
     Evaluates the manually stacked meta-model.
     """
     print(f"--- Evaluating {model_name} (Meta-Model) ---")
 
     # Step 1: Get predicted probabilities from base models
-    preds = []
-    for model in base_models.values():
-        prob = model.predict_proba(X_test)[:, 1].reshape(-1, 1)
-        preds.append(prob)
-    Z_test = np.hstack(preds)
+    Z_test = np.hstack([
+        model.predict_proba(X_test_base)[:, 1].reshape(-1, 1)
+        for model in base_models.values()
+    ])
 
     # Step 2: Predict using the meta-model
     y_pred = meta_model.predict(Z_test)
 
-    # Step 3: Evaluation (same as your current code)
+    # Step 3: Evaluation (reuse your logic)
     print("Overall Performance:")
     print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
     print("\nClassification Report:")
@@ -27,7 +27,6 @@ def evaluate_meta_model(meta_model, base_models, X_test, y_test, test_df, model_
     print(confusion_matrix(y_test, y_pred))
     print("-" * 20)
 
-    # Half hourly accuracy
     results_df = test_df.copy()
     results_df['actual'] = y_test.values
     results_df['predicted'] = y_pred
@@ -48,7 +47,6 @@ def evaluate_meta_model(meta_model, base_models, X_test, y_test, test_df, model_
     print(results_df[['SETTLEMENTDATE', 'actual', 'predicted', 'classification_type']].head(20))
     print("-" * 20)
 
-    # Daily accuracy
     results_df['date'] = pd.to_datetime(results_df['SETTLEMENTDATE']).dt.date
     daily_accuracy = results_df.groupby('date').apply(
         lambda df_group: accuracy_score(df_group['actual'], df_group['predicted'])
@@ -57,6 +55,7 @@ def evaluate_meta_model(meta_model, base_models, X_test, y_test, test_df, model_
     print("\nAccuracy per Day:")
     print(daily_accuracy)
     print("-" * 40)
+
 
 def evaluate_model(model, X_test, y_test, test_df, model_name, target_region):
     """

@@ -43,21 +43,18 @@ def main():
         print("Invalid choice. Please enter 'train' or 'load'.")
         return
 
-    # --- Evaluate all models ---
     
     for name, model in models.items():
-        print(f"\n--- Evaluating {name} ---")
-        
         if name == "meta":
             # Collect base models (exclude 'stacked')
             base_models = {k: v for k, v in models.items() if k != "stacked"}
             evaluate_meta_model(
-                meta_model=model,
-                base_models=base_models,
-                X_test=X_test,
+                meta_model=models["meta"],
+                base_models={k: v for k, v in models.items() if k in ["xgb", "lr", "knn"]},
+                X_test_base=X_test,
                 y_test=y_test,
                 test_df=test_df,
-                model_name=name,
+                model_name="meta",
                 target_region=target_region
             )
         else:
