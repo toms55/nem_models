@@ -34,7 +34,7 @@ def train_xgb(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=xgb_clf,
         param_distributions=param_dist,
-        n_iter=1,
+        n_iter=1000,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -62,7 +62,7 @@ def train_lr(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=lr,
         param_distributions=param_dist,
-        n_iter=1,
+        n_iter=1000,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -98,7 +98,7 @@ def train_knn(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_dist,
-        n_iter=1,
+        n_iter=1000,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
@@ -122,7 +122,6 @@ def train_meta_model(base_models, X_val, y_val):
 
     print("--- Training manual stacking meta-model ---")
 
-    # Step 1: Get predicted probabilities from each base model
     preds = []
     for name, model in base_models.items():
         if hasattr(model, "predict_proba"):
@@ -131,11 +130,9 @@ def train_meta_model(base_models, X_val, y_val):
         else:
             raise ValueError(f"Model '{name}' does not support predict_proba")
 
-    # Step 2: Stack predictions into feature matrix Z
     Z = np.hstack(preds)
 
-    # Step 3: Train logistic regression meta-model
-    meta_model = LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)
+    meta_model = LogisticRegression(class_weight='balanced', max_iter=10000, random_state=42)
     meta_model.fit(Z, y_val)
 
     print("--- Meta-model training complete ---")
