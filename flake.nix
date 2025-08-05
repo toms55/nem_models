@@ -18,6 +18,7 @@
         p.xgboost
         p.scikit-learn
         p.matplotlib
+        p.imbalanced-learn
       ]);
 
     in {

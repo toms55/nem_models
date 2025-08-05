@@ -1,12 +1,18 @@
 import numpy as np
+
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import StackingClassifier
-from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_sample_weight
+
+from xgboost import XGBClassifier
+
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
 
 def train_xgb(X_train, y_train, X_val, y_val):
     print("--- Training XGBoost (XGB) ---")
@@ -77,35 +83,32 @@ def train_lr(X_train, y_train, X_val, y_val):
     return random_search.best_estimator_
 
 def train_knn(X_train, y_train, X_val, y_val):
-    print("--- Training K-Nearest Neighbors (KNN) ---")
+    print("--- Training K-Nearest Neighbors (KNN) with SMOTE ---")
     
-    # Create validation split
-    X_train_split, X_val, y_train_split, y_val = train_test_split(
-        X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
-    )
-    
-    pipeline = Pipeline([
+    pipeline = ImbPipeline([
         ('scaler', StandardScaler()),
+        ('smote', SMOTE(random_state=42)),
         ('knn', KNeighborsClassifier(n_jobs=-1))
     ])
-
+    
     param_dist = {
         'knn__n_neighbors': np.arange(3, 31, 2),
         'knn__weights': ['uniform', 'distance'],
-        'knn__p': [1, 2]
+        'knn__p': [1, 2],
+        'smote__k_neighbors': [3, 5, 7]
     }
-
+    
     random_search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_dist,
-        n_iter=1000,
+        n_iter=20,
         cv=5,
         scoring='roc_auc',
         n_jobs=-1,
         random_state=42,
         verbose=1
     )
-
+    
     random_search.fit(X_train, y_train)
     print(f"Best KNN parameters: {random_search.best_params_}")
     print("-" * 40)
