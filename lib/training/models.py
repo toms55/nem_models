@@ -40,10 +40,10 @@ def train_xgb(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=xgb_clf,
         param_distributions=param_dist,
-        n_iter=1000,
+        n_iter=1200,
         cv=5,
         scoring='roc_auc',
-        n_jobs=-1,
+        n_jobs=3,
         random_state=42,
         verbose=1
     )
@@ -68,10 +68,10 @@ def train_lr(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=lr,
         param_distributions=param_dist,
-        n_iter=1000,
+        n_iter=1200,
         cv=5,
         scoring='roc_auc',
-        n_jobs=-1,
+        n_jobs=3,
         random_state=42,
         verbose=1
     )
@@ -101,10 +101,10 @@ def train_knn(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_dist,
-        n_iter=20,
+        n_iter=1200,
         cv=5,
         scoring='roc_auc',
-        n_jobs=-1,
+        n_jobs=3,
         random_state=42,
         verbose=1
     )
