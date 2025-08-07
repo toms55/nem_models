@@ -14,33 +14,49 @@ from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 
-def train_xgb(X_train, y_train, X_val, y_val):
+def train_xgb(X_train, y_train, X_val, y_val, region):
     print("--- Training XGBoost (XGB) ---")
     scale_pos_weight = y_train.value_counts()[0] / y_train.value_counts()[1]
 
-    param_dist = {
-        'n_estimators': [100, 200, 300, 500],
-        'max_depth': [3, 4, 5, 6, 7, 8],
-        'learning_rate': [0.01, 0.05, 0.1, 0.2],
-        'subsample': [0.6, 0.7, 0.8, 0.9, 1.0],
-        'colsample_bytree': [0.6, 0.7, 0.8, 0.9, 1.0],
-        'gamma': [0, 0.1, 0.2, 0.5, 1],
-        'min_child_weight': [1, 3, 5, 7]
-    }
+    if region == "NSW1":
+        param_dist = {
+            'subsample': np.float64(0.9000000000000002),
+            'scale_pos_weight': np.float64(53.413625304136254),
+            'reg_lambda': np.float64(4.0),
+            'reg_alpha': np.float64(3.4000000000000004),
+            'n_estimators': 450,
+            'min_child_weight': 1,
+            'max_depth': 10,
+            'learning_rate': np.float64(0.015),
+            'gamma': np.float64(0.2),
+            'colsample_bytree': np.float64(0.7500000000000001)
+        }
+    else:
+        param_dist = {
+            'n_estimators': list(range(100, 1001, 50)),
+            'max_depth': list(range(3, 11)),
+            'learning_rate': list(np.arange(0.001, 0.710, 0.001)),
+            'subsample': list(np.arange(0.6, 1.01, 0.05)),
+            'colsample_bytree': list(np.arange(0.6, 1.01, 0.05)),
+            'gamma': list(np.arange(0.0, 1.05, 0.1)),
+            'min_child_weight': list(range(1, 11)),
+            'reg_alpha': list(np.arange(0, 5.5, 0.1)),
+            'reg_lambda': list(np.arange(0, 5.5, 0.5)),
+            'scale_pos_weight': [scale_pos_weight]
+        }
 
     xgb_clf = XGBClassifier(
         objective='binary:logistic',
         eval_metric='logloss',
         use_label_encoder=False,
         scale_pos_weight=scale_pos_weight,
-        random_state=42,
-        early_stopping_rounds=50
+        random_state=42
     )
 
     random_search = RandomizedSearchCV(
         estimator=xgb_clf,
         param_distributions=param_dist,
-        n_iter=1200,
+        n_iter=2000,
         cv=5,
         scoring='roc_auc',
         n_jobs=3,
@@ -48,11 +64,17 @@ def train_xgb(X_train, y_train, X_val, y_val):
         verbose=1
     )
 
-    random_search.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
-    
+    random_search.fit(
+        X_train,
+        y_train,
+        eval_set=[(X_val, y_val)],
+        verbose=False
+    )
+
     print(f"Best XGB parameters: {random_search.best_params_}")
     print("-" * 40)
     return random_search.best_estimator_
+
 
 def train_lr(X_train, y_train, X_val, y_val):
     print("--- Training Logistic Regression (LR) ---")
@@ -142,14 +164,14 @@ def train_meta_model(base_models, X_val, y_val):
     print("-" * 40)
     return meta_model
 
-def train_all_models(X_train_full, y_train_full):
+def train_all_models(X_train_full, y_train_full, regiono):
     # Split into sub-train and validation (meta-model uses val)
     X_subtrain, X_val, y_subtrain, y_val = train_test_split(
         X_train_full, y_train_full, test_size=0.2, random_state=42, stratify=y_train_full
     )
 
     # Base models trained only on subtrain
-    xgb_model = train_xgb(X_subtrain, y_subtrain, X_val, y_val)
+    xgb_model = train_xgb(X_subtrain, y_subtrain, X_val, y_val, region)
     lr_model = train_lr(X_subtrain, y_subtrain, X_val, y_val)
     knn_model = train_knn(X_subtrain, y_subtrain, X_val, y_val)
 

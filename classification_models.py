@@ -5,6 +5,8 @@ from lib.evaluation.metrics import evaluate_model, evaluate_meta_model
 from lib.utils.io import save_model, load_model
 
 def main():
+    regions = ["NSW1", "VIC1", "QLD1", "SA1", "TAS1"]
+    
     # --- Load and preprocess data ---
     df = pd.read_csv("merged_dispatch_price_2021-2025.csv")
     df = df.sort_values('SETTLEMENTDATE')
@@ -33,16 +35,17 @@ def main():
 
     model_names = ["xgb", "lr", "knn", "meta"]
 
-    if choice == "t":
-        models = train_all_models(X_train, y_train)
-        for name, model in models.items():
-            save_model(model, name)
-    elif choice == "l":
-        models = {name: load_model(name) for name in model_names}
-    else:
-        print("Invalid choice. Please enter 'train' or 'load'.")
-        return
-
+    while True:
+        if choice == "t":
+            models = train_all_models(X_train, y_train, target_region)
+            for name, model in models.items():
+                save_model(model, name)
+            break
+        elif choice == "l":
+            models = {name: load_model(name) for name in model_names}
+            break
+        else:
+            print("Invalid choice")
     
     for name, model in models.items():
         if name == "meta":
