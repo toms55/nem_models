@@ -46,6 +46,7 @@ def main():
             break
         else:
             print("Invalid choice")
+            choice = input("Train new models or load existing ones? [t/l]: ").strip()
     
     for name, model in models.items():
         if name == "meta":

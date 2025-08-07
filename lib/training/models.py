@@ -20,16 +20,16 @@ def train_xgb(X_train, y_train, X_val, y_val, region):
 
     if region == "NSW1":
         param_dist = {
-            'subsample': np.float64(0.9000000000000002),
-            'scale_pos_weight': np.float64(53.413625304136254),
-            'reg_lambda': np.float64(4.0),
-            'reg_alpha': np.float64(3.4000000000000004),
-            'n_estimators': 450,
-            'min_child_weight': 1,
-            'max_depth': 10,
-            'learning_rate': np.float64(0.015),
-            'gamma': np.float64(0.2),
-            'colsample_bytree': np.float64(0.7500000000000001)
+            'subsample': [0.9000000000000002],
+            'scale_pos_weight': [53.413625304136254],
+            'reg_lambda': [4.0],
+            'reg_alpha': [3.4000000000000004],
+            'n_estimators': [450],
+            'min_child_weight': [1],
+            'max_depth': [10],
+            'learning_rate': [0.015],
+            'gamma': [0.2],
+            'colsample_bytree': [0.7500000000000001]
         }
     else:
         param_dist = {
@@ -164,7 +164,7 @@ def train_meta_model(base_models, X_val, y_val):
     print("-" * 40)
     return meta_model
 
-def train_all_models(X_train_full, y_train_full, regiono):
+def train_all_models(X_train_full, y_train_full, region):
     # Split into sub-train and validation (meta-model uses val)
     X_subtrain, X_val, y_subtrain, y_val = train_test_split(
         X_train_full, y_train_full, test_size=0.2, random_state=42, stratify=y_train_full
