@@ -16,7 +16,8 @@ from imblearn.pipeline import Pipeline as ImbPipeline
 
 def train_xgb(X_train, y_train, X_val, y_val, region):
     print("--- Training XGBoost (XGB) ---")
-    scale_pos_weight = y_train.value_counts()[0] / y_train.value_counts()[1]
+    # scale_pos_weight = y_train.value_counts()[0] / y_train.value_counts()[1]
+    scale_pos_weight = 1
 
     if region == "NSW1":
         param_dist = {
@@ -109,7 +110,7 @@ def train_knn(X_train, y_train, X_val, y_val):
     
     pipeline = ImbPipeline([
         ('scaler', StandardScaler()),
-        ('smote', SMOTE(random_state=42)),
+        # ('smote', SMOTE(random_state=42)),
         ('knn', KNeighborsClassifier(n_jobs=-1))
     ])
     
@@ -117,7 +118,7 @@ def train_knn(X_train, y_train, X_val, y_val):
         'knn__n_neighbors': np.arange(3, 31, 2),
         'knn__weights': ['uniform', 'distance'],
         'knn__p': [1, 2],
-        'smote__k_neighbors': [3, 5, 7]
+        # 'smote__k_neighbors': [3, 5, 7]
     }
     
     random_search = RandomizedSearchCV(
