@@ -44,7 +44,7 @@ def train_xgb(X_train, y_train, X_val, y_val, region):
             'reg_alpha': list(np.arange(0, 5.5, 0.1)),
             'reg_lambda': list(np.arange(0, 5.5, 0.5)),
             'scale_pos_weight': [scale_pos_weight]
-        }
+    }
 
     xgb_clf = XGBClassifier(
         objective='binary:logistic',

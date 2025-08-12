@@ -1,10 +1,10 @@
 import os
 import joblib
 
-def save_model(model, name):
+def save_model(model, name, region):
     os.makedirs("models", exist_ok=True)
-    joblib.dump(model, f"models/{name}.joblib")
-    print(f"Saved model: models/{name}.joblib")
+    joblib.dump(model, f"models/{name}_{region}.joblib")
+    print(f"Saved model: models/{name}_{region}.joblib")
 
 def load_model(name):
     path = f"models/{name}.joblib"

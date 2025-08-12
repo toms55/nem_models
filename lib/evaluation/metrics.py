@@ -36,12 +36,6 @@ def evaluate_meta_model(meta_model, base_models, X_test_base, y_test, test_df, m
     results_df['predicted'] = y_pred
     results_df['date'] = pd.to_datetime(results_df['SETTLEMENTDATE']).dt.date
 
-    daily_accuracy = results_df.groupby('date').apply(
-        lambda df_group: accuracy_score(df_group['actual'], df_group['predicted'])
-    )
-    print("\nAccuracy per Day:")
-    print(daily_accuracy)
-
     print_daily_confusion_matrix(results_df)
 
 
@@ -63,12 +57,6 @@ def evaluate_model(model, X_test, y_test, test_df, model_name, target_region):
     results_df['actual'] = y_test.values
     results_df['predicted'] = y_pred
     results_df['date'] = pd.to_datetime(results_df['SETTLEMENTDATE']).dt.date
-
-    daily_accuracy = results_df.groupby('date').apply(
-        lambda df_group: accuracy_score(df_group['actual'], df_group['predicted'])
-    )
-    print("\nAccuracy per Day:")
-    print(daily_accuracy)
 
     print_daily_confusion_matrix(results_df)
 

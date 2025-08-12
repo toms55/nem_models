@@ -11,7 +11,7 @@ def main():
     df = pd.read_csv("merged_dispatch_price_2021-2025.csv")
     df = df.sort_values('SETTLEMENTDATE')
 
-    target_region = "NSW1"
+    target_region = "VIC1"
     nem_df = preprocess_data(df, target_region)
 
     # --- Train/test split ---
@@ -39,10 +39,10 @@ def main():
         if choice == "t":
             models = train_all_models(X_train, y_train, target_region)
             for name, model in models.items():
-                save_model(model, name)
+                save_model(model, name, target_region)
             break
         elif choice == "l":
-            models = {name: load_model(name) for name in model_names}
+            models = {name: load_model(f"{name}_{target_region}") for name in model_names}
             break
         else:
             print("Invalid choice")
