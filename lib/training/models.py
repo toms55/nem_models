@@ -16,34 +16,23 @@ from imblearn.pipeline import Pipeline as ImbPipeline
 
 def train_xgb(X_train, y_train, X_val, y_val, region):
     print("--- Training XGBoost (XGB) ---")
-    # scale_pos_weight = y_train.value_counts()[0] / y_train.value_counts()[1]
-    scale_pos_weight = 1
+    scale_pos_weight = y_train.value_counts()[0] / y_train.value_counts()[1]
+    # scale_pos_weight = 1
+    
+    print(f"XGB scale is: {scale_pos_weight}")
 
-    if region == "NSW1":
-        param_dist = {
-            'subsample': [0.9000000000000002],
-            'scale_pos_weight': [53.413625304136254],
-            'reg_lambda': [4.0],
-            'reg_alpha': [3.4000000000000004],
-            'n_estimators': [450],
-            'min_child_weight': [1],
-            'max_depth': [10],
-            'learning_rate': [0.015],
-            'gamma': [0.2],
-            'colsample_bytree': [0.7500000000000001]
-        }
-    else:
-        param_dist = {
-            'n_estimators': list(range(100, 1001, 50)),
-            'max_depth': list(range(3, 11)),
-            'learning_rate': list(np.arange(0.001, 0.710, 0.001)),
-            'subsample': list(np.arange(0.6, 1.01, 0.05)),
-            'colsample_bytree': list(np.arange(0.6, 1.01, 0.05)),
-            'gamma': list(np.arange(0.0, 1.05, 0.1)),
-            'min_child_weight': list(range(1, 11)),
-            'reg_alpha': list(np.arange(0, 5.5, 0.1)),
-            'reg_lambda': list(np.arange(0, 5.5, 0.5)),
-            'scale_pos_weight': [scale_pos_weight]
+   
+    param_dist = {
+        'n_estimators': list(range(100, 1001, 50)),
+        'max_depth': list(range(3, 11)),
+        'learning_rate': list(np.arange(0.001, 0.710, 0.001)),
+        'subsample': list(np.arange(0.6, 1.01, 0.05)),
+        'colsample_bytree': list(np.arange(0.6, 1.01, 0.05)),
+        'gamma': list(np.arange(0.0, 1.05, 0.1)),
+        'min_child_weight': list(range(1, 11)),
+        'reg_alpha': list(np.arange(0, 5.5, 0.1)),
+        'reg_lambda': list(np.arange(0, 5.5, 0.5)),
+        'scale_pos_weight': [scale_pos_weight]
     }
 
     xgb_clf = XGBClassifier(

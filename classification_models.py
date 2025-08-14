@@ -11,7 +11,7 @@ def main():
     df = pd.read_csv("merged_dispatch_price_2021-2025.csv")
     df = df.sort_values('SETTLEMENTDATE')
 
-    target_region = "VIC1"
+    target_region = "SA1"
     nem_df = preprocess_data(df, target_region)
 
     # --- Train/test split ---
