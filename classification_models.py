@@ -11,7 +11,7 @@ def main():
     df = pd.read_csv("merged_dispatch_price_2021-2025.csv")
     df = df.sort_values('SETTLEMENTDATE')
 
-    target_region = "SA1"
+    target_region = "NSW1"
     nem_df = preprocess_data(df, target_region)
 
     # --- Train/test split ---
@@ -50,8 +50,6 @@ def main():
     
     for name, model in models.items():
         if name == "meta":
-            # Collect base models (exclude 'stacked')
-            base_models = {k: v for k, v in models.items() if k != "stacked"}
             evaluate_meta_model(
                 meta_model=models["meta"],
                 base_models={k: v for k, v in models.items() if k in ["xgb", "lr", "knn"]},

@@ -113,7 +113,7 @@ def train_knn(X_train, y_train, X_val, y_val):
     random_search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_dist,
-        n_iter=1200,
+        n_iter=2000,
         cv=5,
         scoring='roc_auc',
         n_jobs=3,
